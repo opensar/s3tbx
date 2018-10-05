@@ -25,6 +25,7 @@ public class PpeOpTest {
     @Test
     public void testPpeOp()  {
         Operator ppeOp = new PpeOp();
+        ppeOp.setParameterDefaultValues();
         ppeOp.setSourceProduct(createSourceProduct());
         Product targetProduct = ppeOp.getTargetProduct();
 
@@ -160,7 +161,7 @@ public class PpeOpTest {
     }
 
     private Product createSourceProduct() {
-        Product product = new Product("OWT_Input", "REFLEC", 10, 10);
+        Product product = new Product("PPE_Input", "REFLEC", 10, 10);
         for (int i = 0; i < MERIS_WAVELENGTHS.length; i++) {
             Band reflecBand = product.addBand("radiance" + (i + 1), ProductData.TYPE_FLOAT32);
             reflecBand.setSpectralWavelength(MERIS_WAVELENGTHS[i]);

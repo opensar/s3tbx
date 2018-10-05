@@ -44,7 +44,7 @@ import java.util.Arrays;
         version = "1.1",
         category = "Optical/Preprocessing",
         description = "Performs Prompt Particle Event (PPE) filtering",
-        authors = " ",
+        authors = "Juancho Gossn, Roman Shevchuk",
         copyright = "(c) 2018 by Brockmann Consult GmbH")
 
 public class PpeOp extends Operator {
@@ -59,20 +59,20 @@ public class PpeOp extends Operator {
     @TargetProduct()
     private Product targetProduct;
 
-    @Parameter(label =  "Filtering cut-off, [mW.m-2.sr-1.nm-1]",defaultValue = "0.7",
+    @Parameter(label = "Filtering cut-off, [mW.m-2.sr-1.nm-1]", defaultValue = "0.7",
             description = "Minimum threshold to differentiate with the neighboring pixels in [mW.m-2.sr-1.nm-1]")
     private double cutOff;
 
-    @Parameter(label =  "Filtering cut-off, number of Median Absolute Deviation",defaultValue = "10",
+    @Parameter(label = "Filtering cut-off, number of Median Absolute Deviation", defaultValue = "10",
             description = "Multiplier of Median Absolute Deviation used for the threshold.")
     private double numberOfMAD;
 
     @Parameter(label = "Valid pixel expression", description = "An expression to filter which pixel are considered.",
-            converter = BooleanExpressionConverter.class,defaultValue = VALID_PIXEL_EXPRESSION)
+            converter = BooleanExpressionConverter.class, defaultValue = VALID_PIXEL_EXPRESSION)
     private String validExpression;
 
     @Parameter(label = "Band keyword", description = "An expression which has to be part of band name(s). Case insensitive.",
-            converter = BooleanExpressionConverter.class,defaultValue = "radiance")
+            converter = BooleanExpressionConverter.class, defaultValue = "radiance")
     private String bandKeyword;
 
 
@@ -81,10 +81,10 @@ public class PpeOp extends Operator {
     @Override
     public void initialize() throws OperatorException {
         validPixelMask = Mask.BandMathsType.create("__valid_pixel_mask", null,
-                getSourceProduct().getSceneRasterWidth(),
-                getSourceProduct().getSceneRasterHeight(),
-                validExpression,
-                Color.GREEN, 0.0);
+                                                   getSourceProduct().getSceneRasterWidth(),
+                                                   getSourceProduct().getSceneRasterHeight(),
+                                                   validExpression,
+                                                   Color.GREEN, 0.0);
         validPixelMask.setOwner(getSourceProduct());
 
         createTargetProduct();
@@ -95,9 +95,9 @@ public class PpeOp extends Operator {
         Rectangle targetRectangle = targetTile.getRectangle();
         Tile sourceTile;
         if (!targetBand.getName().toLowerCase().contains("_ppe_flag")) {
-            Tile flagTile = getSourceTile(targetProduct.getRasterDataNode(targetBand.getName()+"_ppe_flag"), targetRectangle);
+            Tile flagTile = getSourceTile(targetProduct.getRasterDataNode(targetBand.getName() + "_ppe_flag"), targetRectangle);
             sourceTile = getSourceTile(sourceProduct.getRasterDataNode(targetBand.getName()), targetRectangle);
-            Tile landTile=getSourceTile(validPixelMask, targetRectangle);
+            Tile landTile = getSourceTile(validPixelMask, targetRectangle);
             for (int y = targetRectangle.y; y < targetRectangle.y + targetRectangle.height; y++) {
                 checkForCancellation();
                 for (int x = targetRectangle.x; x < targetRectangle.x + targetRectangle.width; x++) {
@@ -109,33 +109,32 @@ public class PpeOp extends Operator {
                         setBandTile(x, y, median, MAD, sourceTile, targetTile);
                         setFlagBandTile(x, y, median, MAD, sourceTile, flagTile);
                     } else {
-                            targetTile.setSample(x, y, pixel);
+                        targetTile.setSample(x, y, pixel);
                     }
                 }
             }
         }
     }
 
-    private void createTargetProduct()  {
+    private void createTargetProduct() {
         targetProduct = new Product(sourceProduct.getName(), sourceProduct.getProductType(), sourceProduct.getSceneRasterWidth(), sourceProduct.getSceneRasterHeight());
 
         final FlagCoding flagCoding = new FlagCoding("ppe_applied");
-        flagCoding.addFlag("PPE applied",1,"PPE applied");
-        flagCoding.setDescription("PPE proccesor flag");
+        flagCoding.addFlag("PPE applied", 1, "PPE applied");
+        flagCoding.setDescription("PPE processor flag");
         targetProduct.getFlagCodingGroup().add(flagCoding);
 
         for (Band band : sourceProduct.getBands()) {
-            if (band.getName().toLowerCase().contains(bandKeyword.toLowerCase()) && (band.getSpectralWavelength()!=0.0f)){
+            if (band.getName().toLowerCase().contains(bandKeyword.toLowerCase()) && (band.getSpectralWavelength() != 0.0f)) {
                 ProductUtils.copyBand(band.getName(), sourceProduct, targetProduct, false);
-                if (!"mW.m-2.sr-1.nm-1".equals(band.getUnit())){
-                    SystemUtils.LOG.warning("The units of "+band.getName()+" are not mW.m-2.sr-1.nm-1. Changing cut-off parameter is suggested.");
+                if (!"mW.m-2.sr-1.nm-1".equals(band.getUnit())) {
+                    SystemUtils.LOG.warning("The units of " + band.getName() + " are not mW.m-2.sr-1.nm-1. Changing cut-off parameter is suggested.");
                 }
-                Band ppeBand = new Band(band.getName()+"_ppe_flag", ProductData.TYPE_INT8,sourceProduct.getSceneRasterWidth(),sourceProduct.getSceneRasterHeight());
+                Band ppeBand = new Band(band.getName() + "_ppe_flag", ProductData.TYPE_INT8, sourceProduct.getSceneRasterWidth(), sourceProduct.getSceneRasterHeight());
                 ppeBand.setSampleCoding(flagCoding);
 
                 targetProduct.addBand(ppeBand);
-            }
-            else{
+            } else {
                 ProductUtils.copyBand(band.getName(), sourceProduct, targetProduct, true);
             }
         }
@@ -147,18 +146,17 @@ public class PpeOp extends Operator {
         ProductUtils.copyGeoCoding(sourceProduct, targetProduct);
     }
 
-    void setBandTile(int x, int y,double median,double MAD, Tile sourceTile, Tile targetTile){
+    void setBandTile(int x, int y, double median, double MAD, Tile sourceTile, Tile targetTile) {
         double pixel = sourceTile.getSampleDouble(x, y);
         if (Math.abs(pixel - median) > cutOff && Math.abs(pixel - median) > (numberOfMAD * MAD)) {
             targetTile.setSample(x, y, median);
-        }
-        else{
+        } else {
             targetTile.setSample(x, y, pixel);
         }
     }
 
 
-    void setFlagBandTile(int x, int y,double median,double MAD, Tile sourceTile, Tile targetTile){
+    void setFlagBandTile(int x, int y, double median, double MAD, Tile sourceTile, Tile targetTile) {
         double pixel = sourceTile.getSampleDouble(x, y);
         if (Math.abs(pixel - median) > cutOff && Math.abs(pixel - median) > (numberOfMAD * MAD)) {
             targetTile.setSample(x, y, 1);
@@ -174,14 +172,14 @@ public class PpeOp extends Operator {
         pixelList[3] = getPixelValue(sourceTile, x, y + 1);
         pixelList[4] = getPixelValue(sourceTile, x, y + 2);
         Arrays.sort(pixelList);
-        if (pixelList[0]<0){
-            throw new OperatorException("Radiance bands contain values lower than zero at x="+x+" y="+y);
+        if (pixelList[0] < 0) {
+            throw new OperatorException("Radiance bands contain values lower than zero at x=" + x + " y=" + y);
         }
         return pixelList;
     }
 
-     static Double getPixelValue(Tile tile, int x, int y) {
-        if ( (0 <= y) && (y < tile.getHeight())) {
+    static Double getPixelValue(Tile tile, int x, int y) {
+        if ((0 <= y) && (y < tile.getHeight())) {
             return tile.getSampleDouble(x, y);
         } else {
             return 0d;
@@ -190,9 +188,9 @@ public class PpeOp extends Operator {
 
     static Double getMedian(double[] listDoubles) {
         Arrays.sort(listDoubles);
-        if (listDoubles[1]==0) {
+        if (listDoubles[1] == 0) {
             return (listDoubles[3]);
-        } else if (listDoubles[0]==0) {
+        } else if (listDoubles[0] == 0) {
             return ((listDoubles[2] + listDoubles[3]) / 2);
         } else {
             return (listDoubles[2]);
@@ -210,13 +208,11 @@ public class PpeOp extends Operator {
             }
         }
         Arrays.sort(listMAD);
-        if (listMAD[1]==-1) {
+        if (listMAD[1] == -1) {
             return listMAD[3];
-        }
-        else if (listMAD[0]==-1){
-            return (listMAD[2]+listMAD[3])/2;
-        }
-        else {
+        } else if (listMAD[0] == -1) {
+            return (listMAD[2] + listMAD[3]) / 2;
+        } else {
             return listMAD[2];
         }
     }
