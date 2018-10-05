@@ -1,0 +1,59 @@
+<!--
+  ~ Copyright (C) 2010 Brockmann Consult GmbH (info@brockmann-consult.de)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option)
+  ~ any later version.
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+  ~ more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, see http://www.gnu.org/licenses/
+  -->
+
+<html>
+<head>
+    <title>PPE Filtering - Algorithm Specification</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">PPE Filtering - Algorithm Specification</td>
+        <td class="header" align="right"><img src="images/snap_header.jpg" border=0></td>
+    </tr>
+</table>
+
+<h3>Introduction</h3>
+<p> This algorithm is used for filtering noise produced by PPE (Prompt Particle Events). By default filtering is applied only over water.
+Filter is applied to every single pixel separately, checking the difference between a pixel and its nearest four vertical neighbors.
+ If the difference is higher than a threshold, the value of the pixel is replaced by the median of the pixel and its neighboring pixels.
+
+    The processor supports the the following sensors:</p>
+<ul>
+    <li>Sentinel-3 OLCI Level2 W(F/R)R</li>
+</ul>
+<p>The algorithm is described in the following articles which are available online.</p>
+
+<dl>
+
+
+    <dt>This algorithm connects satellite ocean colour observations to historical in-situ colour observations:</dt>
+    <dd>
+        <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+            <param name="content" value="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0063766">
+            <param name="text" value="Wernand, M.R, Van der Woerd, H.J., Gieskes. W.W.C, 2013. Trends in ocean colour and
+    chlorophyll concentration from 1889 to present. Plos One. http://dx.plos.org/10.1371/journal.pone0063766 (open access)">
+        </object>
+    </dd>
+</dl>
+
+<br>
+<hr>
+</body>
+</html>

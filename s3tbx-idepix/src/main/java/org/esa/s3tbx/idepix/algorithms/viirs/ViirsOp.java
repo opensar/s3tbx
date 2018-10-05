@@ -30,16 +30,16 @@ import java.util.Map;
         description = "Pixel identification and classification for VIIRS.")
 public class ViirsOp extends Operator{
 
-    @Parameter(defaultValue = "false",
+    @Parameter(defaultValue = "true",
             label = " Write TOA reflectances to the target product",
             description = "Write TOA reflectances to the target product.")
-    private boolean outputViirsRhoToa = false;
+    private boolean outputViirsRhoToa = true;
 
 //    @Parameter(defaultValue = "true",
 //            label = " Debug bands",
 //            description = "Write further useful bands to target product.")
 //    private boolean outputDebug = true;
-    private boolean outputDebug = false;
+    private boolean outputDebug = true;
 
     @Parameter(defaultValue = "1", label = " Width of cloud buffer (# of pixels)")
     private int cloudBufferWidth;

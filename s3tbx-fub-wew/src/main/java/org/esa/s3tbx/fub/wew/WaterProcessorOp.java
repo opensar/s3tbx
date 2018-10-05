@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.esa.s3tbx.fub.wew.WaterProcessorOpConstant.SOURCE_SAMPLE_VALID_MASK;
+import static org.esa.s3tbx.fub.wew.WaterProcessorOpConstant.*;
 
 @OperatorMetadata(alias = "FUB.Water", authors = "Thomas Schroeder, Michael Schaale",
         copyright = "Institute for Space Sciences (WeW), Freie Universitaet Berlin",

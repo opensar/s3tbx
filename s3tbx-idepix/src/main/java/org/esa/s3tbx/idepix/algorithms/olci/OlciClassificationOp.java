@@ -63,7 +63,7 @@ public class OlciClassificationOp extends Operator {
     )
     private boolean ignoreSeaIceClimatology;
 
-    @Parameter(defaultValue = "true",
+    @Parameter(defaultValue = "false",
             label = " Use SRTM Land/Water mask",
             description = "If selected, SRTM Land/Water mask is used instead of L1b land flag. " +
                     "Slower, but in general more precise.")
